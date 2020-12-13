@@ -1,12 +1,13 @@
 import logging
 import sys
 from model import game
+from model.player import RandomPlayer, HighPlayer, HighCautionPlayer, LowPlayer, MDPPlayer
 import progressbar
 
 
 def configure_logging():
     root = logging.getLogger()
-    root.setLevel(logging.INFO)
+    root.setLevel(logging.WARN)
 
     handler = logging.StreamHandler(sys.stdout)
     handler.setLevel(logging.DEBUG)
@@ -14,22 +15,22 @@ def configure_logging():
     handler.setFormatter(formatter)
     root.addHandler(handler)
 
-GAMES_TO_PLAY = 100
+GAMES_TO_PLAY = 1000
 
-configure_logging()
-
-game = game.Game()
+game = game.Game([MDPPlayer, RandomPlayer, MDPPlayer, RandomPlayer])
 
 team0_wins, team1_wins = 0, 0
+team0_points, team1_points = 0, 0
+number_games_played = 0
 
 progressbar.streams.wrap_stderr()
+configure_logging()
 
 for _ in progressbar.progressbar(range(GAMES_TO_PLAY), redirect_stdout=True):
     hands0, hands1 = 0, 0
     points0, points1 = 0, 0
 
-    # while points0 < 10 and points1 < 10:
-    for _ in range(1):
+    while points0 < 10 and points1 < 10:
         result = game.play_tricks()
         hands0 += result[0]
         hands1 += result[1]
@@ -48,7 +49,14 @@ for _ in progressbar.progressbar(range(GAMES_TO_PLAY), redirect_stdout=True):
     else:
         team1_wins += 1
 
+    team0_points += points0
+    team1_points += points1
+
+    number_games_played += 1
+
     logging.info(f'Team {0 if points0 > points1 else 1} won')
 
 print(f'Team 0 wins: {team0_wins}')
 print(f'Team 1 wins: {team1_wins}')
+print(f'Team 0 point average: {team0_points / number_games_played}')
+print(f'Team 1 point average: {team1_points / number_games_played}')

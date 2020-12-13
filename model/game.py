@@ -1,16 +1,12 @@
 from .heuristics import *
 import logging
 from .deck import Deck
-from .player import RandomPlayer, HighPlayer, HighCautionPlayer, LowPlayer, MDPPlayer
 from .trick import Trick
 
 
 class Game:
-    def __init__(self):
-        # self.generate_trick()
-        self.player_types = [
-            MDPPlayer, HighPlayer, MDPPlayer, HighPlayer
-        ]
+    def __init__(self, player_types):
+        self.player_types = player_types
         assert len(self.player_types) == 4, 'Invalid number of players'
 
     def play_tricks(self):
